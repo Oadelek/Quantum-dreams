@@ -28,7 +28,7 @@ class Config:
     READOUT_ERROR_PROB = 0.05 # Probability of readout error
     SHOTS = 1024 # Number of shots for simulation
     EVAL_SHOTS = 4096 # More shots for evaluation to get smoother results
-    SPSA_MAX_ITER = 30 # Increased iterations for better training (adjust as needed)
+    SPSA_MAX_ITER = 30 # Increased iterations for better training
     VQC_REPS = 2 # Number of repetitions in VQC layers (increased for complexity)
     NUM_SYNDROME_SAMPLES = 50 # Increased training data size
     NUM_EVALUATION_SAMPLES = 100 # Samples for evaluation
@@ -84,7 +84,7 @@ def initialize_lattice(lattice_size=config.LATTICE_SIZE):
 
 
 def compute_cost(bound_circuit, backend, shots):
-    """Compute the expectation value of Pauli-Z on the first qubit."""
+    """This is to compute the expectation value of Pauli-Z on the first qubit."""
     from qiskit import transpile
     transpiled_circuit = transpile(bound_circuit, backend)
     job = backend.run(transpiled_circuit, shots=shots)
@@ -96,7 +96,7 @@ def compute_cost(bound_circuit, backend, shots):
         value = 1 if qubit_0_state == 0 else -1
         exp_val += value * count
     exp_val /= shots
-    return -exp_val  # Negative for minimization, adjust if needed
+    return -exp_val  # Negative for minimization
 
 
 
@@ -266,7 +266,7 @@ def create_centralized_vqc():
     circuit.measure_all()
     return circuit, len(circuit.parameters)
 
-# --- Cost Function (Expected value of Pauli-Z on first qubit - Example) ---
+# --- Cost Function (Expected value of Pauli-Z on first qubit) ---
 def cost_function(params, circuit, backend, shots=config.TRAINING_COST_SHOTS, pauli_observable=config.PAULI_OBSERVABLE):
     """Cost function based on expectation value of Pauli-Z on the first qubit (qubit 0)."""
     # Bind parameters to the circuit
@@ -338,7 +338,7 @@ def evaluate_architecture(architecture_type, circuit_or_data, optimal_params, ev
                 job_eval = backend.run(transpiled_eval_circuit, shots=config.EVAL_SHOTS)
                 counts_eval = job_eval.result().get_counts()
                 predicted_bitstring = max(counts_eval, key=counts_eval.get)
-                predicted_logical_value = int(predicted_bitstring[0])  # Adjust index as needed
+                predicted_logical_value = int(predicted_bitstring[0])  
                 predicted_logical_values.append(predicted_logical_value)
 
         except Exception as e:
@@ -378,7 +378,7 @@ def run_experiment(lattice, qpus, data_qubits, data_indices, ancilla_qubits, err
         initial_params_local.append(initial_params)
 
         # Define cost function that is *partially* dependent on syndrome (or independent for unsupervised)
-        def local_cost_function_train(params): # Example: using first syndrome for simplicity - for proper training, adapt for each syndrome in training data
+        def local_cost_function_train(params): # Example: using first syndrome for simplicity
             local_circuit_instance, _ = create_local_vqc(qpu_qubits, training_syndromes[0], qpu_idx, error_rates) # Recreate circuit for each cost eval (inefficient, but clearer for example)
             return cost_function(params, local_circuit_instance, backend) # Use generic cost function
 
@@ -730,6 +730,7 @@ if __name__ == "__main__":
     # Initialize lattice and other components
     lattice, qpus, data_qubits, ancilla_qubits, data_indices, ancilla_indices = initialize_lattice()
     error_rates = config.ERROR_RATES # use error rates from config
+
 
     # Run the experiment and get results
     evaluation_results, trained_architectures, execution_times = run_experiment(lattice, qpus, data_qubits, data_indices, ancilla_qubits, error_rates)
