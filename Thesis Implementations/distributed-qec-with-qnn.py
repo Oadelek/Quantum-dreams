@@ -315,7 +315,7 @@ def evaluate_architecture(architecture_type, circuit_or_data, optimal_params, ev
         bound_circuit = None
         try:
             if architecture_type == 'local':
-                qpu_idx, qpu_qubits = circuit_or_data  # Unpack as needed
+                qpu_idx, qpu_qubits = circuit_or_data  
                 local_circuit, _ = create_local_vqc(qpu_qubits, syndrome, qpu_idx, error_rates)
                 param_dict = {local_circuit.parameters[i]: optimal_params[i] for i in range(len(optimal_params))}
                 bound_circuit = local_circuit.assign_parameters(param_dict)
