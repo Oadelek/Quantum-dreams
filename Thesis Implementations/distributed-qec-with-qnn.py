@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import logging
 import time
 
-# Configure logging (as before)
+# Configure logging
 logging.basicConfig(filename='decoder_log.txt', level=logging.INFO,
                     format='%(asctime)s - %(message)s')
 
